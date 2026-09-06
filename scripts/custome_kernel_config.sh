@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -eu
 
 CONFIGS=(
@@ -19,7 +20,6 @@ CONFIGS=(
 
     "CONFIG_DEBUG_INFO=y"
     "CONFIG_DEBUG_INFO_DWARF5=y"
-    "# CONFIG_DEBUG_INFO_REDUCED is not set"
     "CONFIG_DEBUG_INFO_BTF=y"
 
     "CONFIG_KPROBE_EVENTS=y"
@@ -35,21 +35,24 @@ echo "Using kernel config: $KCFG"
 for CONFIG in "${CONFIGS[@]}"; do
     KEY="${CONFIG%%=*}"
 
-    # Remove existing setting first.
     sed -i \
-        -e "/^${KEY}=/d" \
+        -e "/^${KEY}=.*/d" \
         -e "/^# ${KEY} is not set$/d" \
         "$KCFG"
 
-    if [[ "$CONFIG" == \#* ]]; then
-        echo "$CONFIG" >> "$KCFG"
-    else
-        echo "$CONFIG" >> "$KCFG"
-    fi
+    echo "$CONFIG" >> "$KCFG"
 done
 
+# Explicitly disable DEBUG_INFO_REDUCED.
+sed -i \
+    -e '/^CONFIG_DEBUG_INFO_REDUCED=.*/d' \
+    -e '/^# CONFIG_DEBUG_INFO_REDUCED is not set$/d' \
+    "$KCFG"
+
+echo '# CONFIG_DEBUG_INFO_REDUCED is not set' >> "$KCFG"
+
 echo
-echo "=== dae kernel config ==="
+echo "=== dae kernel config fragment ==="
 grep -E \
     'CONFIG_(BPF|BPF_SYSCALL|BPF_JIT|CGROUPS|KPROBES|NET_INGRESS|NET_EGRESS|NET_SCH_INGRESS|NET_CLS_BPF|NET_CLS_ACT|BPF_STREAM_PARSER|DEBUG_INFO|DEBUG_INFO_BTF|DEBUG_INFO_REDUCED|KPROBE_EVENTS|BPF_EVENTS)' \
     "$KCFG" || true

@@ -336,6 +336,27 @@ jobs:
         #     ../scripts/3rd/add_r8125.sh
         #     ;;
         # esac
+        # echo "===== FINAL KERNEL CONFIG ====="
+        grep -E \
+          'CONFIG_(BPF|BPF_SYSCALL|BPF_JIT|CGROUPS|KPROBES|NET_INGRESS|NET_EGRESS|NET_SCH_INGRESS|NET_CLS_BPF|NET_CLS_ACT|BPF_STREAM_PARSER|DEBUG_INFO|DEBUG_INFO_BTF|DEBUG_INFO_REDUCED|KPROBE_EVENTS|BPF_EVENTS)' \
+          kernel/.config || true
+
+        echo
+        echo "===== DAE CONFIG CHECK ====="
+
+        grep -q '^CONFIG_BPF=y$' kernel/.config
+        grep -q '^CONFIG_BPF_SYSCALL=y$' kernel/.config
+        grep -q '^CONFIG_BPF_JIT=y$' kernel/.config
+        grep -q '^CONFIG_NET_INGRESS=y$' kernel/.config
+        grep -q '^CONFIG_NET_EGRESS=y$' kernel/.config
+        grep -q '^CONFIG_NET_CLS_ACT=y$' kernel/.config
+        grep -q '^CONFIG_BPF_STREAM_PARSER=y$' kernel/.config
+        grep -q '^CONFIG_DEBUG_INFO_BTF=y$' kernel/.config
+        grep -q '^CONFIG_KPROBE_EVENTS=y$' kernel/.config
+        grep -q '^CONFIG_BPF_EVENTS=y$' kernel/.config
+        grep -q '^# CONFIG_DEBUG_INFO_REDUCED is not set$' kernel/.config
+
+        echo "===== DAE KERNEL CONFIG OK ====="
 
     - name: Build sd image
       id: build_sd_image
