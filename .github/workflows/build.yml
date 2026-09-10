@@ -341,6 +341,13 @@ jobs:
         #     ;;
         # esac
 
+    - name: Enlarge kernel partition (BTF-enabled kernel is larger)
+      run: |
+        cd project
+        ## CONFIG_DEBUG_INFO_BTF makes kernel.img bigger than the stock 40 MiB
+        ## kernel partition; grow it so the kernel is not silently skipped.
+        ../scripts/custome_sd_image.sh
+
     - name: Build sd image
       id: build_sd_image
       run: |
