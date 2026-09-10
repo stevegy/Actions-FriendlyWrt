@@ -341,13 +341,6 @@ jobs:
         #     ;;
         # esac
 
-    - name: Strip Debug Symbols from Kernel
-      run: |
-        cd project
-        echo "=== Stripping DWARF debug symbols from Kernel Image ==="
-        # 精确定位 RK3576 ARM64 内核产物 Image
-        aarch64-linux-gnu-strip --strip-debug kernel/arch/arm64/boot/Image || true
-
     - name: Build sd image
       id: build_sd_image
       run: |
